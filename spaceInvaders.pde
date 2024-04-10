@@ -1,10 +1,8 @@
 //falta
-//- Arreglar el error de cuando pierde el jugador
 //- agregar otros tipos de invaders
-//- reducir las vidas cuando impactan al jugador
-//- game over
-//- Menu
-//- Bloques/Escudos
+//- game over invader toca a jugador
+//- tipografia
+//- efectos de sonido
 
 Ship player;
 PImage invaderImg;
@@ -40,8 +38,8 @@ void draw() {
   textSize(20);
   text("Score: " + score, 10,20);
   
-  //text("FPS: " + frameRate, 200, 20);
-  
+  text("FPS: " + frameRate, 200, 20);
+            
   //Ship
   player.display();
   player.move();
@@ -94,6 +92,7 @@ void displayBullets(){
   }
 }
 
+
 void invaderGenerarBullets(){
   for (int i = invaderBullets.size()-1; i >= 0; i--) {
     Bullet bul = invaderBullets.get(i);
@@ -106,8 +105,17 @@ void invaderGenerarBullets(){
       if(bul.hitPlayer(player)){
         invaderBullets.remove(i);//si impacta jugador reiniciar
         println("muerto");
-        resetGame();
-        break;// NO QUITAR!!!
+        
+        //--------------
+        playerLives.lives --;
+        if(playerLives.lives <= 0){
+          fill(255,255,255);
+          textSize(20);
+          text("Game Over", width/2, height/2);
+          noLoop();
+          resetGame();
+        }
+        break;
       }
     }
   }
@@ -170,8 +178,9 @@ void keyPressed(){
     bullets.add(bul);
   }
   if(keyCode == 'R'){
-    System.out.print("Reset");   
-    resetGame();
+    System.out.print("Reset"); 
+    loop();
+    //resetGame();
   }
   
 }
@@ -188,12 +197,20 @@ void keyReleased(){
 
 
 void resetGame() {
+  //loop();
+  playerLives.lives = 3;
   player = new Ship(width/2 , height - 40);
   invaders.clear();
   bullets.clear();
   invaderBullets.clear();
   score = 0;
   lastInvaderShot = 0;
+  
+  //fill(255);
+  //textSize(32);
+  //textAlign(CENTER, CENTER);
+  //text("Game Over", width/2, height/2);
+  
   for(int i=0; i<11; i++){
     for(int j=0; j<3; j++){
       invaders.add(new Invader(i*50+50,j*40+60));
