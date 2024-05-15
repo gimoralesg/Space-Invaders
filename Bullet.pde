@@ -6,10 +6,7 @@ class Bullet{
     this.y = posy;
     this.vel = 3;
   }
-  
-  //void update(){
-  //  y -= vel; 
-  //}
+
   void move(){
     y -= vel; 
   }
@@ -27,11 +24,13 @@ class Bullet{
     return (y < 0);
   }
   
+  //Bullets hit invader
   boolean hitInvader(Invader inv) {
     float diam = dist(x, y, inv.pos.x, inv.pos.y);
     return (diam < inv.invaderWidth/2 && diam < inv.invaderHeight/2);
   }
   
+  //Bullets hit player
   boolean hitPlayer(Ship player) {
     float diam = dist(x, y, player.pos.x, player.pos.y);
     return (diam < player.shipWidth/2 && diam < player.shipHeight/2);

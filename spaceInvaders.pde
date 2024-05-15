@@ -1,11 +1,10 @@
-//falta
-//- agregar otros tipos de invaders
 //- game over invader toca a jugador
-//- tipografia
 //- efectos de sonido
+//- game Win message
 
 Ship player;
 PImage invaderImg;
+PFont arcadeClassic;
 Lives playerLives = new Lives();
 ArrayList<Invader> invaders = new ArrayList<Invader>();
 ArrayList<Bullet> bullets = new ArrayList<Bullet>();
@@ -17,6 +16,10 @@ int score=0;
 
 void setup() {
   size(640, 480);
+  
+  //Font
+  arcadeClassic = createFont("space_invaders.ttf",64);
+  textFont(arcadeClassic);  
   
   //pos nave
   player = new Ship(width/2 , height - 40);
@@ -33,12 +36,12 @@ void setup() {
 void draw() {
   background(0);
   
+  
   //score
   fill(255);
   textSize(20);
   text("Score: " + score, 10,20);
-  
-  text("FPS: " + frameRate, 200, 20);
+  //text("FPS: " + frameRate, 200, 20);
             
   //Ship
   player.display();
@@ -60,6 +63,12 @@ void draw() {
 
 
 
+
+
+
+
+
+
 void displayInvaders() {
   for (Invader invader : invaders) {
     invader.updatePos();
@@ -68,7 +77,6 @@ void displayInvaders() {
 }
 
 
-//Hacer funcion diplayBullets
 void displayBullets(){
   for (int i = bullets.size()-1; i >= 0; i--) {
     Bullet bul = bullets.get(i);
@@ -105,33 +113,14 @@ void invaderGenerarBullets(){
       if(bul.hitPlayer(player)){
         invaderBullets.remove(i);//si impacta jugador reiniciar
         println("muerto");
-        
-        //--------------
-        playerLives.lives --;
-        if(playerLives.lives <= 0){
-          fill(255,255,255);
-          textSize(20);
-          text("Game Over", width/2, height/2);
-          noLoop();
-          resetGame();
-        }
+        playerHit();
         break;
       }
     }
   }
   // Invader bullets aleatorios
-  // 
-  
-  if (millis() - lastInvaderShot > invaderShotInterval) {
-    println(millis());
-    int invaderIndex = int(random(invaders.size())); 
-    Invader inv = invaders.get(invaderIndex); //selecciona random invader
-      
- 
-    Bullet bul = new Bullet(inv.pos.x, inv.pos.y + inv.invaderHeight/2);
-    invaderBullets.add(bul);
-    lastInvaderShot = millis();
-  }
+  genRandBullets();
+
 }
 
 
@@ -161,6 +150,33 @@ void moveInvaders(){
       inv.moveRight();
       inv.moveDown();
     }
+  }
+}
+
+void playerHit(){
+  
+  playerLives.lives --;
+
+  if(playerLives.lives <= 0){
+    fill(0,255,0);
+    textSize(40);
+    textAlign(CENTER);
+    text("Game Over", width/2, height/2);
+    noLoop();
+    resetGame();
+  } 
+}
+
+void genRandBullets(){
+  if (millis() - lastInvaderShot > invaderShotInterval) {
+    println(millis());
+    int invaderIndex = int(random(invaders.size())); 
+    Invader inv = invaders.get(invaderIndex); //selecciona random invader
+      
+ 
+    Bullet bul = new Bullet(inv.pos.x, inv.pos.y + inv.invaderHeight/2);
+    invaderBullets.add(bul);
+    lastInvaderShot = millis();
   }
 }
 
@@ -205,11 +221,7 @@ void resetGame() {
   invaderBullets.clear();
   score = 0;
   lastInvaderShot = 0;
-  
-  //fill(255);
-  //textSize(32);
-  //textAlign(CENTER, CENTER);
-  //text("Game Over", width/2, height/2);
+ 
   
   for(int i=0; i<11; i++){
     for(int j=0; j<3; j++){

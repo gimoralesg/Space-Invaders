@@ -1,4 +1,5 @@
 PImage img1, img2;
+
 class Invader {
   PVector pos;
   int invaderWidth;
@@ -42,6 +43,11 @@ class Invader {
     }
     //rect(pos.x, pos.y, invaderWidth, invaderHeight);
   }
+  
+  //boolean invHitPlayer(Ship player) {
+  //  float diam = dist(x, y, player.pos.x, player.pos.y);
+  //  return (diam < player.shipWidth/2 && diam < player.shipHeight/2);
+  //}
   
   void updatePos() {
     pos.x += velX;
