@@ -1,4 +1,4 @@
-PImage img1, img2;
+
 
 class Invader {
   PVector pos;
@@ -7,10 +7,12 @@ class Invader {
   int invaderSpacing;
   int numRows;
   int numCols;
+  PImage invaderimg0, invaderimg1, invaderdead;
   color col = color(0,255,0);
   float left, right, top, bottom;
-  boolean removed;
+  
   float velX, velY;
+  boolean dead;
   
   Invader(int x, int y){
     this.pos = new PVector(x, y);
@@ -18,11 +20,12 @@ class Invader {
     invaderWidth = 20;
     invaderHeight = 20;
 
-    img1 = loadImage("img/invader.png");
-    img2 = loadImage("img/invader1.png");
+    invaderimg0 = loadImage("img/invader.png");
+    invaderimg1 = loadImage("img/invader1.png");
+    invaderdead = loadImage("img/invaderexplosion.png");
  //<>//
     
-    removed = false;
+    dead = false;
     
 
     velX = 0;
@@ -36,18 +39,18 @@ class Invader {
     //rectMode(CENTER);
     imageMode(CENTER);
     
-    if(Math.round(frameCount/15 % 2) == 0){  
-      image(img1, pos.x, pos.y);
-    }else{
-      image(img2, pos.x, pos.y);
+    if(dead){
+      image(invaderdead, pos.x, pos.y);
+    }else{   
+      if(Math.round(frameCount/15 % 2) == 0){  
+        image(invaderimg0, pos.x, pos.y);
+      }else{
+        image(invaderimg1, pos.x, pos.y);
+      }
     }
+
     //rect(pos.x, pos.y, invaderWidth, invaderHeight);
   }
-  
-  //boolean invHitPlayer(Ship player) {
-  //  float diam = dist(x, y, player.pos.x, player.pos.y);
-  //  return (diam < player.shipWidth/2 && diam < player.shipHeight/2);
-  //}
   
   void updatePos() {
     pos.x += velX;
@@ -61,5 +64,14 @@ class Invader {
   }
   void moveDown(){
     pos.y += 10;
+  }
+  
+  boolean hitPlayer(Ship player) {
+    float diam = dist(pos.x, pos.y, player.pos.x, player.pos.y);
+    return (diam < (invaderWidth + player.shipWidth) / 2 && diam < (invaderHeight + player.shipHeight) / 2);
+  }
+  
+  void explode(){
+    dead = true;
   }
 }

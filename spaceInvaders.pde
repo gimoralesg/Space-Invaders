@@ -1,9 +1,8 @@
-//- game over invader toca a jugador
-//- efectos de sonido
-//- game Win message
-
+import processing.sound.*;
+ 
 Ship player;
-PImage invaderImg;
+PImage img;
+SoundFile backgroundMusic, playershoot, playerExplosion, playerDead, invaderDead, victory;
 PFont arcadeClassic;
 Lives playerLives = new Lives();
 ArrayList<Invader> invaders = new ArrayList<Invader>();
@@ -16,6 +15,18 @@ int score=0;
 
 void setup() {
   size(640, 480);
+  
+  //Sound
+  playershoot = new SoundFile(this, "audio/PlayerShootSound.wav");
+  playerExplosion = new SoundFile(this, "audio/PlayerExplosionSound.wav");
+  playerDead = new SoundFile(this, "audio/playerdead1.wav");
+  invaderDead = new SoundFile(this, "audio/invaderkilled.wav");
+  victory = new SoundFile(this, "audio/victory.wav");
+  backgroundMusic = new SoundFile(this, "audio/backgroundMusic.wav");
+  backgroundMusic.loop();
+  
+  //img
+  //explosionPlayerIMG = loadImage("img/playerexplosion.png");
   
   //Font
   arcadeClassic = createFont("space_invaders.ttf",64);
@@ -33,6 +44,7 @@ void setup() {
   }
 }
 
+
 void draw() {
   background(0);
   
@@ -40,7 +52,7 @@ void draw() {
   //score
   fill(255);
   textSize(20);
-  text("Score: " + score, 10,20);
+  text("Score: " + score, 20,30);
   //text("FPS: " + frameRate, 200, 20);
             
   //Ship
@@ -58,11 +70,10 @@ void draw() {
 
   displayBullets();  
   invaderGenerarBullets();
+  InvaderPlayerColision();
+  
+  checkGameWon();
 }
-
-
-
-
 
 
 
@@ -90,8 +101,11 @@ void displayBullets(){
       for (int j = invaders.size()-1; j >= 0; j--) {
         Invader inv = invaders.get(j);
         if (bul.hitInvader(inv)) {
+          inv.explode();
+          invaderDead.play();
           invaders.remove(j);
           bullets.remove(i);
+          
           score += 10;
           break;
         }
@@ -113,6 +127,8 @@ void invaderGenerarBullets(){
       if(bul.hitPlayer(player)){
         invaderBullets.remove(i);//si impacta jugador reiniciar
         println("muerto");
+        player.explode();
+        playerExplosion.play();
         playerHit();
         break;
       }
@@ -122,6 +138,7 @@ void invaderGenerarBullets(){
   genRandBullets();
 
 }
+
 
 
 void moveInvaders(){
@@ -153,15 +170,28 @@ void moveInvaders(){
   }
 }
 
-void playerHit(){
-  
+void InvaderPlayerColision(){
+ for (Invader inv : invaders) {
+    if (inv.hitPlayer(player)) {
+      playerHit();
+      break; 
+    }
+  }
+}
+
+
+void playerHit(){  
   playerLives.lives --;
 
   if(playerLives.lives <= 0){
+    playerDead.play();
+    backgroundMusic.pause();
     fill(0,255,0);
     textSize(40);
     textAlign(CENTER);
     text("Game Over", width/2, height/2);
+    textSize(12);
+    text("Presiona 'r' para reiniciar", width/2, height/2 + 50);
     noLoop();
     resetGame();
   } 
@@ -191,12 +221,13 @@ void keyPressed(){
   } 
   if (key == ' ') {
     Bullet bul = new Bullet(player.pos.x, player.pos.y - player.shipHeight/2);
+    playershoot.play();
     bullets.add(bul);
+    
   }
-  if(keyCode == 'R'){
+  if(keyCode == 'R' ||  keyCode == 'r' ){
     System.out.print("Reset"); 
     loop();
-    //resetGame();
   }
   
 }
@@ -212,8 +243,24 @@ void keyReleased(){
 }
 
 
+void checkGameWon() {
+  if (invaders.isEmpty()) {
+    fill(0,255,0);
+    textSize(40);
+    textAlign(CENTER);
+    victory.play();
+    backgroundMusic.pause();
+    text("GANASTE!!!", width/2, height/2 - 20);
+    textSize(12);
+    text("Presiona R para volver a jugar", width/2, height/2 + 20);
+    noLoop();
+    resetGame();
+  }
+}
+
 void resetGame() {
   //loop();
+  textAlign(LEFT);
   playerLives.lives = 3;
   player = new Ship(width/2 , height - 40);
   invaders.clear();

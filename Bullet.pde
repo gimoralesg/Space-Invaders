@@ -1,4 +1,7 @@
+
+
 class Bullet{
+  
   float x, y, vel;
   
   Bullet(float posx, float posy) {
