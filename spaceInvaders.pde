@@ -48,7 +48,6 @@ void setup() {
 void draw() {
   background(0);
   
-  
   //score
   fill(255);
   textSize(20);
@@ -76,10 +75,6 @@ void draw() {
 }
 
 
-
-
-
-
 void displayInvaders() {
   for (Invader invader : invaders) {
     invader.updatePos();
@@ -88,28 +83,34 @@ void displayInvaders() {
 }
 
 
-void displayBullets(){
-  for (int i = bullets.size()-1; i >= 0; i--) {
+void displayBullets() {
+  for (int i = bullets.size() - 1; i >= 0; i--) {
     Bullet bul = bullets.get(i);
     bul.move();
     bul.display();
-    
-    if (bul.offscreen()) {//bullet fuera de la pantalla
+
+    if (bul.offscreen()) { // bullet fuera de la pantalla
       bullets.remove(i);
     } else {
       // Comprobar colisión con invaders
-      for (int j = invaders.size()-1; j >= 0; j--) {
+      for (int j = invaders.size() - 1; j >= 0; j--) {
         Invader inv = invaders.get(j);
         if (bul.hitInvader(inv)) {
           inv.explode();
           invaderDead.play();
-          invaders.remove(j);
           bullets.remove(i);
-          
           score += 10;
           break;
         }
       }
+    }
+  }
+
+  // Remove invaders
+  for (int j = invaders.size() - 1; j >= 0; j--) {
+    Invader inv = invaders.get(j);
+    if (inv.isDeath()) {
+      invaders.remove(j);
     }
   }
 }
@@ -245,6 +246,9 @@ void keyReleased(){
 
 void checkGameWon() {
   if (invaders.isEmpty()) {
+    if(backgroundMusic.isPlaying()){
+      backgroundMusic.pause();
+    }
     fill(0,255,0);
     textSize(40);
     textAlign(CENTER);
@@ -268,6 +272,7 @@ void resetGame() {
   invaderBullets.clear();
   score = 0;
   lastInvaderShot = 0;
+  backgroundMusic.loop();
  
   
   for(int i=0; i<11; i++){
